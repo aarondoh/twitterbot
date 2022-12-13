@@ -1,42 +1,253 @@
+<!-- can you design me a frontend application using html and js that can be easily called that allows you to log in with twitter, replies to the same tweet thread everytime allows you to upload an image, schedule tweets and has a custom text box that lets you input custom text for each tweet! with a queue on the side showing which tweets are upcoming and allowing you to unschedule or edit them if necessary. -->
+
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Twitter Bot</title>
+    <title>Twitter Scheduler</title>
+    <style>
+        body {
+font-family: sans-serif;
+}
+
+h1, form {
+text-align: center;
+}
+
+h1 {
+font-family: "Helvetica Neue", sans-serif;
+}
+
+#tweet-queue {
+width: 50%;
+margin: auto;
+list-style-type: none;
+padding: 0;
+}
+
+#tweet-queue li {
+border: 1px solid #ccc;
+padding: 10px;
+margin-bottom: 10px;
+}
+
+button {
+font-family: "Helvetica Neue", sans-serif;
+background-color: #1da1f2;
+color: white;
+border-radius: 100px;
+border: none;
+padding: 5px 10px;
+margin-left: 10px;
+cursor: pointer;
+}
+
+input[type="text"], textarea {
+font-family: "Helvetica Neue", sans-serif;
+border: 1px solid #ccc;
+padding: 5px 10px;
+border-radius: 5px;
+}
+
+/* Set the style so the text forms go in a descending order line by line */
+form {
+display: flex;
+flex-direction: column;
+align-items: center;
+}
+
+label {
+margin-bottom: 5px;
+}
+
+textarea {
+margin-bottom: 10px;
+}
+
+button {
+margin-top: 10px;
+}
+
+input[type="file"] {
+margin-bottom: 10px;
+}
+
+#tweet-queue {
+margin-top: 20px;
+}
+
+h2 {
+text-align: center;
+margin-top: 20px;
+}
+      </style>      
   </head>
   <body>
-    <h1>Twitter Bot</h1>
-    <button id="send-tweet-button">Send Tweet</button>
+    <h1>Twitter Scheduler</h1>
+
+    <!-- Twitter login button -->
+    <button id="login-button">Log In with Twitter</button>
+
+    <!-- Tweet thread reply form -->
+    <form id="tweet-form">
+      <label for="thread-id">Tweet Thread ID:</label>
+      <input type="text" id="thread-id" placeholder="Enter tweet thread ID">
+      <label for="reply-text">Reply Text:</label>
+      <textarea id="reply-text" placeholder="Enter your reply text"></textarea>
+      <input type="file" id="image" accept="image/*">
+      <button type="submit">Reply to Tweet Thread</button>
+    </form>
+
+    <!-- Tweet scheduling form -->
+    <form id="schedule-form">
+      <label for="tweet-text">Tweet Text:</label>
+      <textarea id="tweet-text" placeholder="Enter your tweet text"></textarea>
+      <label for="schedule-time">Scheduled Time:</label>
+      <input type="datetime-local" id="schedule-time">
+      <button type="submit">Schedule Tweet</button>
+    </form>
+
+    <!-- Scheduled tweet queue -->
+    <h2>Scheduled Tweet Queue</h2>
+    <ul id="tweet-queue">
+      <!-- Scheduled tweets will be added here -->
+    </ul>
 
     <script>
-      // Load the required libraries and modules
-      const Twitter = require('twitter');
-      const secrets = require('./secrets');
+      // Twitter login functionality
+      const loginButton = document.getElementById('login-button');
+      loginButton.addEventListener('click', () => {
+// Redirect to Twitter login page
+window.location = 'https://twitter.com/login';
+});
 
-      // Create a new Twitter client
-      const client = new Twitter({
-        consumer_key: secrets.consumerKey,
-        consumer_secret: secrets.consumerSecret,
-        access_token_key: secrets.accessToken,
-        access_token_secret: secrets.accessTokenSecret
-      });
+  // Tweet thread reply functionality
+  const tweetForm = document.getElementById('tweet-form');
+  tweetForm.addEventListener('submit', (event) => {
+    // Prevent form from submitting
+    event.preventDefault();
 
-      // Set the tweet that you want to reply to
-      const tweetId = '1234567890';
-      const replyText = 'This is a reply to the original tweet';
+    // Get thread ID and reply text
+    const threadId = document.getElementById('thread-id').value;
+    const replyText = document.getElementById('reply-text').value;
 
-      // Send the reply when the button is clicked
-      document.getElementById('send-tweet-button').addEventListener('click', () => {
-        client.post('statuses/update', {
-          status: replyText,
-          in_reply_to_status_id: tweetId
-        }, (error, tweet, response) => {
-          if (error) {
-            console.error(error);
-          } else {
-            console.log(`Reply sent: ${tweet.text}`);
-          }
-        });
-      });
-    </script>
-  </body>
-</html>
+    // Check if an image has been selected
+    const imageInput = document.getElementById('image');
+    let imageData;
+    if (imageInput.files.length > 0) {
+      // Get image data
+      const file = imageInput.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      imageData = reader.result;
+    }
+
+    // Reply to the tweet thread
+    // TODO: Call Twitter API to reply to the tweet thread
+
+    // Clear form
+    tweetForm.reset();
+  });
+
+  // Tweet scheduling functionality
+  const scheduleForm = document.getElementById('schedule-form');
+  scheduleForm.addEventListener('submit', (event) => {
+    // Prevent form from submitting
+    event.preventDefault();
+
+    // Get tweet text and scheduled time
+    const tweetText = document.getElementById('tweet-text').value;
+    const scheduleTime = document.getElementById('schedule-time').value;
+
+    // Schedule the tweet
+    // TODO: Call Twitter API to schedule the tweet
+
+    // Clear form
+    scheduleForm.reset();
+  });
+
+  // Scheduled tweet queue functionality
+  const tweetQueue = document.getElementById('tweet-queue');
+
+    // Function to add a tweet to the queue
+    const addTweetToQueue = (tweetText, scheduleTime) => {
+    // Create a new list item for the tweet
+    const tweetItem = document.createElement('li');
+
+    // Add tweet text and scheduled time to the item
+    tweetItem.innerHTML = `
+      <p>${tweetText}</p>
+      <p>Scheduled for: ${scheduleTime}</p>
+    `;
+
+    // Add buttons to edit or unschedule the tweet
+    const editButton = document.createElement('button');
+    editButton.innerText = 'Edit';
+    editButton.addEventListener('click', () => {
+      // TODO: Edit tweet functionality
+    });
+    tweetItem.appendChild(editButton);
+
+    const unscheduleButton = document.createElement('button');
+    unscheduleButton.innerText = 'Unschedule';
+    unscheduleButton.addEventListener('click', () => {
+      // TODO: Unschedule tweet functionality
+    });
+    tweetItem.appendChild(unscheduleButton);
+
+    // Add the item to the queue
+    tweetQueue.appendChild(tweetItem);
+  };
+
+  // TODO: Call Twitter API to get a list of scheduled tweets and display them in the queue
+
+
+//   <!DOCTYPE html>
+// <html>
+//   <head>
+//     <title>Twitter Scheduler</title>
+//     <style>
+//       /* Use a modern CSS reset to ensure consistent styling across browsers */
+//       html, body, div, span, applet, object, iframe,
+//       h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+//       a, abbr, acronym, address, big, cite, code,
+//       del, dfn, em, img, ins, kbd, q, s, samp,
+//       small, strike, strong, sub, sup, tt, var,
+//       b, u, i, center,
+//       dl, dt, dd, ol, ul, li,
+//       fieldset, form, label, legend,
+//       table, caption, tbody, tfoot, thead, tr, th, td,
+//       article, aside, canvas, details, embed, 
+//       figure, figcaption, footer, header, hgroup, 
+//       menu, nav, output, ruby, section, summary,
+//       time, mark, audio, video {
+//         margin: 0;
+//         padding: 0;
+//         border: 0;
+//         font-size: 100%;
+//         font: inherit;
+//         vertical-align: baseline;
+//       }
+
+//       /* Remove default list styling */
+//       ul {
+//         list-style: none;
+//       }
+
+//       /* Use the same font as Twitter for the whole page */
+//       body {
+//         font-family: "Helvetica Neue", sans-serif;
+//       }
+
+//       /* Center the header and forms */
+//       h1, form {
+//         text-align: center;
+//       }
+
+//       /* Style the tweet queue */
+//       #tweet-queue {
+//         width: 50%;
+//         margin: auto;
+//         padding: 0;
+//       }
+
+//       /* Style
